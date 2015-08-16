@@ -12,70 +12,49 @@ import org.springframework.stereotype.Component;
 
 import java.io.*;
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 public class MovieBOImplementation implements MovieBO{
 
     public MovieBOImplementation() {
-
+        movieToResponse = new HashMap<String,String>();
     }
 
     @Autowired
     private MovieDAO movieDAO;
 
     String json;
-
+    Map<String,String> movieToResponse;
     public String searchForMovie(final String movieName, final String token,final Calendar calendar) {
 
-        Thread t1 = new Thread(new Runnable() {
-            public void run() {
-                CloseableHttpClient httpclient = HttpClients.createDefault();
-                CloseableHttpResponse response = null;
+        movieDAO.saveQuery(token, movieName, calendar);
 
-                System.out.println("Searching for movie");
-                HttpGet httpGet = new HttpGet(PropertiesHandler.getProperty("url") + "?t=" + movieName );
-                try {
-                    response = httpclient.execute(httpGet);
-                } catch (IOException e) {
-                    System.out.println("Unable to execute the GET ");
-                    e.printStackTrace();
-                }
-                BufferedReader reader = null;
-                try {
-                    reader = new BufferedReader(new InputStreamReader(response.getEntity().getContent(), "UTF-8"));
-                    json = reader.readLine();
-                    System.out.println("JSON response from server is " + json);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
+        if (movieToResponse.containsKey(movieName)) {
+            System.out.println("returning cached JSON : " + movieToResponse.get(movieName));
+            return movieToResponse.get(movieName);
+        }
+        CloseableHttpClient httpclient = HttpClients.createDefault();
+        CloseableHttpResponse response = null;
 
-        Thread t2 = new Thread(new Runnable() {
-            public void run() {
-                movieDAO.saveTimeStamp(token,calendar);
-                File file = new File("tokenTest.txt");
-                try {
-                    FileWriter fw = new FileWriter(file);
-                    BufferedWriter bw = new BufferedWriter(fw);
-                    fw.write(token);
-                    fw.flush();
-                    fw.close();
-                } catch (IOException e) {
-                    System.out.println("Unable to write token to file");
-                    e.printStackTrace();
-                }
-            }
-        });
-        t2.start();
-        t1.start();
+        System.out.println("Searching for movie");
+        HttpGet httpGet = new HttpGet(PropertiesHandler.getProperty("url") + "?t=" + movieName );
         try {
-            t1.join();
-        } catch (InterruptedException e) {
-            System.out.println("Unable to join the thread");
+            response = httpclient.execute(httpGet);
+        } catch (IOException e) {
+            System.out.println("Unable to execute the GET ");
             e.printStackTrace();
         }
-
+        BufferedReader reader = null;
+        try {
+            reader = new BufferedReader(new InputStreamReader(response.getEntity().getContent(), "UTF-8"));
+            json = reader.readLine();
+            movieToResponse.put(movieName,json);
+            System.out.println("JSON response from server is " + json);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         System.out.println("returning JSON is " + json);
         return json;

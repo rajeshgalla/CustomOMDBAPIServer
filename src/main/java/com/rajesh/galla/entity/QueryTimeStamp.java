@@ -16,6 +16,7 @@ public class QueryTimeStamp {
     @GeneratedValue(strategy = GenerationType.TABLE)
     long ID;
     long userID;
+    String movieName;
     @Temporal(TemporalType.TIMESTAMP)
     private Calendar calendar;
 
@@ -33,6 +34,14 @@ public class QueryTimeStamp {
 
     public void setUserID(long userID) {
         this.userID = userID;
+    }
+
+    public String getMovieName() {
+        return movieName;
+    }
+
+    public void setMovieName(String movieName) {
+        this.movieName = movieName;
     }
 
     public Calendar getCalendar() {

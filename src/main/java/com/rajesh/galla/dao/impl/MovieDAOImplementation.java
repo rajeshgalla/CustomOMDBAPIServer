@@ -22,7 +22,7 @@ public class MovieDAOImplementation extends HibernateDaoSupport implements Movie
     @Autowired
     QueryTimeStamp queryTimeStamp;
 
-    public void saveTimeStamp(String token, Calendar calendar) {
+    public void saveQuery(String token, String movieName, Calendar calendar) {
 
         Query query = getHibernateTemplate().getSessionFactory().getCurrentSession().createQuery("from UserDetails where token = ?");
         query.setString(0, token);
@@ -37,7 +37,7 @@ public class MovieDAOImplementation extends HibernateDaoSupport implements Movie
 
         queryTimeStamp.setCalendar(calendar);
         queryTimeStamp.setUserID(userDetails.getUserID());
-
+        queryTimeStamp.setMovieName(movieName);
         getHibernateTemplate().save(queryTimeStamp);
     }
 }

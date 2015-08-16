@@ -22,27 +22,14 @@ public class UserDetailsBOImplementation implements UserDetailsBO {
     private SignUpResponse signUpResponse = new SignUpResponse();
     private SecureRandom random = new SecureRandom();
 
-    public SignUpResponse saveUser(UserDetails userDetails) {
+    public SignUpResponse saveUser(final UserDetails userDetails) {
 
         String token = getUUID();
         userDetails.setToken(token);
         signUpResponse.setToken(token);
-        saveToken(token); // For testing
+        System.out.println("Token is " + token);
         userDetailsDAO.saveUser(userDetails);
         return signUpResponse;
-    }
-
-    private void saveToken(String token) {
-
-        File file = new File("userSignUpTest.txt");
-        try {
-            FileWriter fw = new FileWriter(file);
-            BufferedWriter bufferedWriter = new BufferedWriter(fw);
-            bufferedWriter.write(token);
-        } catch (IOException e) {
-            System.out.println("Unable to write to file");
-            e.printStackTrace();
-        }
     }
 
     public String getUUID() {
