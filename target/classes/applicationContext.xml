@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+       http://www.springframework.org/schema/tx
+        http://www.springframework.org/schema/tx/spring-tx.xsd"
+       default-autowire="byName">
+
+    <context:component-scan base-package="com.rajesh.galla, com.rajesh.galla.bo, com.rajesh.galla.dao
+     com.rajesh.galla.entity, com.rajesh.galla.resource" />
+
+    <!--
+		Instructing Spring to perform declarative transaction management
+		automatically on annotated classes.
+	-->
+    <bean id="transactionManager"
+          class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+        <!--<property name="sessionFactory" ref="sessionFactory"/>-->
+    </bean>
+
+    <bean id="placeholderConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="location">
+            <value>classpath:database.properties</value>
+        </property>
+    </bean>
+
+    <bean class="java.net.URI" id="dbUrl">
+        <constructor-arg value="#{systemEnvironment['DATABASE_URL']}"/>
+    </bean>
+
+    <bean id="dataSource" class="org.apache.commons.dbcp2.BasicDataSource">
+        <property name="driverClassName" value="${connection.driver_class}" />
+        <property name="url" value="#{ 'jdbc:postgresql://' + @dbUrl.getHost() + ':' + @dbUrl.getPort() + @dbUrl.getPath()  + '?ssl=true&amp;sslfactory=org.postgresql.ssl.NonValidatingFactory'}"/>
+        <property name="username" value="#{ @dbUrl.getUserInfo().split(':')[0] }"/>
+        <property name="password" value="#{ @dbUrl.getUserInfo().split(':')[1] }"/>
+    </bean>
+
+    <!--<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource" >-->
+        <!--<property name="driverClassName" value="${connection.driver_class}" />-->
+        <!--<property name="url" value="${connection.url}" />-->
+        <!--<property name="username" value="${connection.username}" />-->
+        <!--<property name="password" value="${connection.password}" />-->
+    <!--</bean>-->
+
+    <bean id="sessionFactory"
+          class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+        <property name="dataSource">
+            <ref bean="dataSource"/>
+        </property>
+        <property name="hibernateProperties">
+            <props>
+                <prop key="hibernate.dialect">${dialect}</prop>
+                <prop key="hibernate.show_sql">true</prop>
+                <prop key="hibernate.hbm2ddl.auto">${hbm2ddl}</prop>
+            </props>
+        </property>
+        <property name="packagesToScan" value="com.rajesh.galla.entity"/>
+    </bean>
+
+
+</beans>
