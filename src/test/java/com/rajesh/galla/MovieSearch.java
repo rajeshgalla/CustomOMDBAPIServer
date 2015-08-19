@@ -6,6 +6,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClients;
 import org.json.JSONObject;
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.BufferedReader;
@@ -27,6 +28,7 @@ public class MovieSearch {
         HttpGet httpGet = new HttpGet(ResourceHandler.getResource("url")+"movies/Titanic?token=" + token);
         HttpClient httpClient = HttpClients.createDefault();
         HttpResponse httpResponse = httpClient.execute(httpGet);
+        Assert.assertTrue(httpResponse.getStatusLine().getStatusCode() == 200);
         BufferedReader reader = null;
         try {
             reader = new BufferedReader(new InputStreamReader(httpResponse.getEntity().getContent(), "UTF-8"));

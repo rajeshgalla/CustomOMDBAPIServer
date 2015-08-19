@@ -8,6 +8,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.json.JSONObject;
+import org.junit.Assert;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -34,6 +35,7 @@ public class UserSignUp {
         httpPost.setEntity(stringEntity);
 
         HttpResponse httpResponse = httpclient.execute(httpPost);
+        Assert.assertTrue(httpResponse.getStatusLine().getStatusCode() == 200);
         BufferedReader reader = null;
         try {
 
