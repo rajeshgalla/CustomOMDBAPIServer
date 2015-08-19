@@ -14,8 +14,6 @@ import java.util.logging.Logger;
 @Path("/users")
 public class UserResource {
 
-    public Logger logger = Logger.getLogger("User Resource");
-
     @Autowired
     private UserDetailsBO userDetailsBO;
 
@@ -27,15 +25,8 @@ public class UserResource {
     @Produces("application/json")
     public SignUpResponse saveUser(UserDetails userDetails) {
 
-        logger.info("save user method reached");
-        logger.info(userDetails.toString());
+        System.out.println(userDetails.toString());
         SignUpResponse signUpResponse = userDetailsBO.saveUser(userDetails);
         return signUpResponse;
-    }
-
-    @GET
-    public String checkStatus() {
-
-        return "It works";
     }
 }
